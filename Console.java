@@ -54,9 +54,16 @@ public class Console {
 					history();
 				} else if (command.equals("dir")) {
 					dir();
-				} else if(command.equals("type")) {
+				} else if (command.equals("type")) {
 					type();
-				} else {
+				} else if (command.equals("find")) {
+					find();
+				} else if (command.equals("find2")) {
+					find2();
+				} else if(command.equals("cd")) {
+					cd();
+				}
+				else {
 					for (String arg : argArr) {
 						System.out.println(arg);
 					}
@@ -67,8 +74,9 @@ public class Console {
 		}
 	}
 
-	
 
+
+	// 명령어들을 q에 넣어주는 메서드
 	private static void save(String input) {
 		if (input == null || "".equals(input))
 			return;
@@ -78,9 +86,9 @@ public class Console {
 		if (q.size() > MAX_SIZE)
 			q.pollFirst();
 
-		System.out.println(q);
 	}
 
+	// 최근에 입력한 명령어를 보여주는 메서드
 	private static void history() {
 		int i = 0;
 
@@ -93,6 +101,7 @@ public class Console {
 		System.out.println(q);
 	}
 
+	// 파일 목록을 보여주는 메서드
 	private static void dir() {
 		String pattern = "";
 
@@ -133,28 +142,94 @@ public class Console {
 			System.out.println("USAGE: dir [FILENAME]");
 		}
 	}
-	
+
+	//
 	private static void type() throws IOException {
-		if(argArr.length != 2) {
+		if (argArr.length != 2) {
 			System.out.println("Usage : type FILE_NAME");
 			return;
 		}
-		
+
 		String fileName = argArr[1];
-		
+
 		File tmp = new File(fileName);
-		
-		if(tmp != null) {
+
+		if (tmp.exists()) {
 			FileReader fr = new FileReader(tmp);
 			BufferedReader br = new BufferedReader(fr);
-			
+
 			String line = "";
-			for(int i = 0; (line = br.readLine()) != null; i++) {
-					System.out.println(line);
+			for (int i = 0; (line = br.readLine()) != null; i++) {
+				System.out.println(line);
 			}
-			
-		}else {
-			System.out.println("존재하지 안흔 파일입니다. 다시입력해주세요");
+
+		} else {
+			System.out.println( fileName + "존재하지 않는 파일입니다.");
 		}
 	}
+
+	// 지정된 키워드를 지정된 파일에서 찾아 화면에 보여주는 메서드
+	private static void find() throws IOException {
+		if (argArr.length != 3) {
+			System.out.println("USAGE : find KEYWORD FILE_NAME");
+			return;
+		}
+
+		String keyword = argArr[1];
+		String fileName = argArr[2];
+
+		File tmp = new File(fileName);
+
+		if (tmp.exists()) {
+			FileReader fr = new FileReader(tmp);
+			BufferedReader br = new BufferedReader(fr);
+
+			String line = "";
+			for (int i = 0; (line = br.readLine()) != null; i++) {
+				if (line.indexOf(keyword) != -1) {
+					System.out.println(i + ": " + line);
+				}
+			}
+		} else {
+			System.out.println(fileName + "존재하지 않는 파일입니다.");
+		}
+	}
+	
+	private static void find2() throws IOException{
+		if(argArr.length!=3) {
+			System.out.println("USAGE : find2 KEYWORD FILE_NAME");
+			return;
+		}
+		
+		String keyword = argArr[1];
+		String pattern = argArr[2];
+		pattern = pattern.toUpperCase();
+		pattern = pattern.replace(".", "\\.");
+		pattern = pattern.replace("*", ".*");
+		pattern = pattern.replace("?", ".{1}");
+		
+		Pattern p = Pattern.compile(pattern);
+		
+		for (File f : curDir.listFiles()) {
+			String tmp = f.getName().toUpperCase();
+			Matcher m = p.matcher(tmp);
+
+			if (m.matches()) {
+				if(f.isDirectory()) continue;
+				
+				FileReader fr = new FileReader(f);
+				BufferedReader br = new BufferedReader(fr);
+				
+				String line = "";
+				
+				System.out.println("--------------" + f.getName());
+				for (int i = 0; (line = br.readLine()) != null; i++) {
+					if (line.indexOf(keyword) != -1) {
+						System.out.println(i + ": " + line);
+					}
+				}
+			}
+		}
+	}
+
 }
