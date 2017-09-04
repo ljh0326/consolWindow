@@ -22,7 +22,7 @@ public class Console {
 //          1. 화면으로부터 라인단위로 입력받는다.
 			String input = sc.nextLine();
 			
-		
+			save(input);
 //			1. 입력받은 값에서 앞뒤 공백을 제거한다.
 			//trim 은 원본을 바꾸지 않는다.
 			input = input.trim();
@@ -34,15 +34,44 @@ public class Console {
 			if("".equals(command))
 				continue;
 			
+			command = command.toLowerCase();
+			
 //            2. q 또는 Q를 입력하면 실행종료한다.
-			if(input.equalsIgnoreCase("q"))
+			if(command.equals("q"))
 				System.exit(0);
-			else {
+			else if(command.equals("history")) {
+				history();
+			} else {
 				for(String arg : argArr) {
 					System.out.println(arg);
 				}
 			}
 		}
 	}
+	
+	private static void save(String input) {
+		if(input == null || "".equals(input))
+			return;
+		
+		q.add(input);
+		
+		if(q.size() > MAX_SIZE)
+			q.pollFirst();
+		
+		System.out.println(q);
+	}
+
+	private static void history() {
+		int i = 0;
+		
+		while(i != 5) {
+			System.out.println(q.get(i));
+			i ++;
+		}
+		
+		System.out.println(q);
+	}
+
+
 	
 }
