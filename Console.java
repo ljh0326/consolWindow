@@ -67,6 +67,8 @@ public class Console {
 		}
 	}
 
+	
+
 	private static void save(String input) {
 		if (input == null || "".equals(input))
 			return;
@@ -131,5 +133,28 @@ public class Console {
 			System.out.println("USAGE: dir [FILENAME]");
 		}
 	}
-
+	
+	private static void type() throws IOException {
+		if(argArr.length != 2) {
+			System.out.println("Usage : type FILE_NAME");
+			return;
+		}
+		
+		String fileName = argArr[1];
+		
+		File tmp = new File(fileName);
+		
+		if(tmp != null) {
+			FileReader fr = new FileReader(tmp);
+			BufferedReader br = new BufferedReader(fr);
+			
+			String line = "";
+			for(int i = 0; (line = br.readLine()) != null; i++) {
+					System.out.println(line);
+			}
+			
+		}else {
+			System.out.println("존재하지 안흔 파일입니다. 다시입력해주세요");
+		}
+	}
 }
