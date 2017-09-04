@@ -60,10 +60,9 @@ public class Console {
 					find();
 				} else if (command.equals("find2")) {
 					find2();
-				} else if(command.equals("cd")) {
+				} else if (command.equals("cd")) {
 					cd();
-				}
-				else {
+				} else {
 					for (String arg : argArr) {
 						System.out.println(arg);
 					}
@@ -74,7 +73,38 @@ public class Console {
 		}
 	}
 
+	private static void cd() {
+		
+		if(argArr.length == 1) {
+			System.out.println(curDir);
+			return;
+		} else if(argArr.length > 2) {
+			System.out.println("USAGE : cd directory");
+			return;
+		}
+		
+		String subDir = argArr[1];
+//		 1. 입력된 디렉토리(subDir)가 ".."이면,
+//			1.1  현재 디렉토리의 조상 디렉토리를 얻어서 현재 디렉토리로 지정한다.
+		if(subDir.equals(".."))
+			 curDir = curDir.getParentFile();
+//		 2. 입력된 디렉토리(subDir)가 "."이면,  단순히 현재 디렉토리의 경로를 화면에 출력한다.
+		else if(subDir.equals("."))
+			System.out.println(curDir.getPath());
+		else {
+			File f = new File(curDir,subDir);
+			
+			if(f.exists()) {
+				curDir = f;
+			}else {
+				System.out.println("유효하지 않은 디렉토리");
+			}
+		}
+//    3. 1 또는 2의 경우가 아니면, 입력된 디렉토리(subDir)가 현재 디렉토리의 하위디렉토리인지 확인한다.
+//        3.1 확인결과가 true이면, 현재 디렉토리(curDir)을 입력된 디렉토리(subDir)로 변경한다.
+//        3.2 확인결과가 false이면, "유효하지 않은 디렉토리입니다."고 화면에 출력한다.
 
+	}
 
 	// 명령어들을 q에 넣어주는 메서드
 	private static void save(String input) {
@@ -109,7 +139,7 @@ public class Console {
 		case 1: // dir만 입력한 경우 현재 디렉토리의 모든 파일과 디렉토리를 보여준다.
 			// 1. 반복문을 이용해서 현재디렉토리의 모든 파일의 목록을 출력한다.(File클래스의 listFiles()사용)
 			for (File f : curDir.listFiles()) {
-				if (curDir.isDirectory()) {
+				if (f.isDirectory()) {
 					System.out.println("[" + f.getName() + "]");
 				} else {
 					System.out.println(f.getName());
@@ -164,7 +194,7 @@ public class Console {
 			}
 
 		} else {
-			System.out.println( fileName + "존재하지 않는 파일입니다.");
+			System.out.println(fileName + "존재하지 않는 파일입니다.");
 		}
 	}
 
@@ -194,34 +224,35 @@ public class Console {
 			System.out.println(fileName + "존재하지 않는 파일입니다.");
 		}
 	}
-	
-	private static void find2() throws IOException{
-		if(argArr.length!=3) {
+
+	private static void find2() throws IOException {
+		if (argArr.length != 3) {
 			System.out.println("USAGE : find2 KEYWORD FILE_NAME");
 			return;
 		}
-		
+
 		String keyword = argArr[1];
 		String pattern = argArr[2];
 		pattern = pattern.toUpperCase();
 		pattern = pattern.replace(".", "\\.");
 		pattern = pattern.replace("*", ".*");
 		pattern = pattern.replace("?", ".{1}");
-		
+
 		Pattern p = Pattern.compile(pattern);
-		
+
 		for (File f : curDir.listFiles()) {
 			String tmp = f.getName().toUpperCase();
 			Matcher m = p.matcher(tmp);
 
 			if (m.matches()) {
-				if(f.isDirectory()) continue;
-				
+				if (f.isDirectory())
+					continue;
+
 				FileReader fr = new FileReader(f);
 				BufferedReader br = new BufferedReader(fr);
-				
+
 				String line = "";
-				
+
 				System.out.println("--------------" + f.getName());
 				for (int i = 0; (line = br.readLine()) != null; i++) {
 					if (line.indexOf(keyword) != -1) {
